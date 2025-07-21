@@ -66,7 +66,12 @@
     "host_permissions": [
       "https://chatgpt.com/*",
       "https://claude.ai/*",
-      "https://gemini.google.com/*"
+      "https://gemini.google.com/*",
+      "https://c/*"
+    ],
+    "permissions": [
+      "activeTab",
+      "storage"
     ],
     "web_accessible_resources": [
       {

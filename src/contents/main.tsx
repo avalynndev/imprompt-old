@@ -1,9 +1,11 @@
 import { useEffect } from "react";
-import { streamText } from "ai";
-import { google } from "~lib/google";
+
 const isChatGPT = window.location.hostname.includes("chatgpt.com");
 const isGemini = window.location.hostname.includes("gemini.google.com");
 const isClaude = window.location.hostname.includes("claude.ai");
+
+const BACKEND_URL =
+  process.env.PLASMO_PUBLIC_BACKEND_URL || "http://localhost:3001";
 
 function Main() {
   useEffect(() => {
@@ -161,16 +163,37 @@ function Main() {
           enhanceButton.style.cursor = "not-allowed";
 
           try {
-            let streamedText = "";
-            const prompt = `You are an expert prompt engineer. Your task is to rewrite the following user prompt to make it more detailed, specific, and effective for an AI assistant, while strictly maintaining the original intent and context. \n- If the original prompt is vague or unclear, do NOT invent context; instead, briefly analyze what is missing, then provide your best attempt at a more effective version, making reasonable assumptions but keeping the rewrite concise and actionable.\n- Do NOT include explanations or meta-commentary in your output—just the improved prompt.\n- If the original is already clear and specific, simply polish it for clarity and completeness.\n\nOriginal prompt:\n"""\n${currentText}\n"""\n\nImproved prompt:`;
-
-            const { textStream } = await streamText({
-              model: google("gemini-2.5-pro"),
-              prompt,
+            // Call your backend instead of directly using the API
+            const response = await fetch(`${BACKEND_URL}/api/enhance-prompt`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                prompt: currentText,
+              }),
             });
 
-            for await (const textPart of textStream) {
+            if (!response.ok) {
+              const errorData = await response.json().catch(() => ({}));
+              throw new Error(
+                errorData.error || `HTTP error! status: ${response.status}`
+              );
+            }
+
+            // Handle streaming response
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let streamedText = "";
+
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+
+              const textPart = decoder.decode(value, { stream: true });
               streamedText += textPart;
+
+              // Update textarea with streamed content
               if ((isChatGPT || isClaude) && textarea) {
                 textarea.textContent = streamedText;
                 // For Claude, also try setting innerHTML as backup
@@ -205,7 +228,18 @@ function Main() {
             }, 2000);
           } catch (error) {
             console.error("Error enhancing prompt:", error);
-            alert("Error enhancing prompt. Please check your API key.");
+
+            let errorMessage = "Error enhancing prompt. Please try again.";
+            if (error.message.includes("Rate limit")) {
+              errorMessage =
+                "Rate limit reached. Please wait before trying again.";
+            } else if (error.message.includes("Failed to fetch")) {
+              errorMessage =
+                "Cannot connect to enhancement service. Please check your connection.";
+              console.log(error);
+            }
+
+            alert(errorMessage);
             enhanceButton.innerHTML = "❌";
             setTimeout(() => {
               enhanceButton.innerHTML = "✨";

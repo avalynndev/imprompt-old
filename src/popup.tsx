@@ -8,7 +8,6 @@ import KoFiLogo, {
   GeminiLogo,
   GithubLogo,
 } from "~logo";
-import { Input } from "~components/ui/input";
 
 function Popup() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
@@ -112,28 +111,6 @@ function Popup() {
         </span>
       </div>
       <div className="flex flex-col gap-4 w-full max-w-md mx-auto">
-        <div className="flex flex-col items-center gap-4 w-full bg-muted/30 backdrop-blur-md border border-muted p-6 rounded-2xl shadow-lg">
-          <span className="text-xl font-bold tracking-tight text-muted-foreground">
-            API Key
-          </span>
-          <div className="w-full flex flex-col gap-2">
-            <Input
-              type="password"
-              placeholder="Enter your Gemini API Key"
-              value={geminiKey}
-              onChange={(e) => setGeminiKey(e.target.value)}
-              className="bg-background/80"
-            />
-            <Button onClick={handleSaveKey} className="w-full">
-              Save Key
-            </Button>
-            {saveStatus && (
-              <p className="text-xs text-green-500 text-center mt-1">
-                {saveStatus}
-              </p>
-            )}
-          </div>
-        </div>
         {/* Ko-Fi Donate Button */}
         <div className="flex justify-center">
           <Button
@@ -170,7 +147,7 @@ function Popup() {
               rel="noopener noreferrer"
               className="flex items-center gap-3 p-3 px-4 h-11 bg-muted rounded-xl hover:bg-muted/60 transition-all duration-200 group"
             >
-              <Button className="flex items-center gap-3 p-3 px-4 h-11 bg-muted rounded-xl hover:bg-muted/60 w-full">
+              <Button className="flex items-center gap-3 h-11 bg-muted rounded-xl hover:bg-muted/60 w-full dark:text-white text-black">
                 + more
               </Button>
             </a>
