@@ -1,15 +1,9 @@
 import { useEffect } from "react";
 import { streamText } from "ai";
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { google } from "~lib/google";
 const isChatGPT = window.location.hostname.includes("chatgpt.com");
 const isGemini = window.location.hostname.includes("gemini.google.com");
 const isClaude = window.location.hostname.includes("claude.ai");
-
-const geminiKey = "";
-
-const google = createGoogleGenerativeAI({
-  apiKey: geminiKey,
-});
 
 function Main() {
   useEffect(() => {
@@ -97,7 +91,7 @@ function Main() {
           }
         } else {
           textarea = container.querySelector(
-            ".input-area-container, .chat-input, .composer, .PromptTextarea__Positioner"
+            "textarea, [contenteditable='true'], [data-testid='chat-input'], .ql-editor"
           );
         }
 
