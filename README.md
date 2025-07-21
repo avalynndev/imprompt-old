@@ -1,6 +1,9 @@
 # Imprompt
 A Chrome extension that enhances prompts on ChatGPT, Claude and Gemini websites, making your AI interactions more effective and productive.
 
+https://github.com/user-attachments/assets/4dbb43ab-45c4-4fe1-a794-6778f6ebd078
+
+
 ## Features
 - Instantly rewrite and enhance your prompts for better AI results
 - Seamless integration with ChatGPT, Claude and Gemini
