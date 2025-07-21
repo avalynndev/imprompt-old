@@ -7,26 +7,18 @@ A Chrome extension that enhances prompts on ChatGPT, Claude and Gemini websites,
 - Simple, user-friendly interface
 - Secure: your prompts are processed locally in your browser
 
+# Installation
+Since this extension is not on the Chrome Web Store, you need to install it manually:
 
-## Installation
+### 1. Download the Extension
+- Go to the [Releases](https://github.com/avalynndev/imprompt/releases) section of this repository.
+- Download the latest .zip file under Assets (e.g., v0.1-imprompt-chrome.zip).
+- Unzip the file to a folder on your computer.
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/avalynndev/imprompt.git
-   cd imprompt
-   ```
-2. **Add your Gemini API key:**
-   Edit the API key in `src/contents/main.tsx`.
-3. **Install dependencies and build:**
-   ```bash
-   npm install
-   npm run build
-   ```
-4. **Load the extension in Chrome:**
-   - Go to `chrome://extensions/`
-   - Enable Developer Mode
-   - Click "Load unpacked" and select the `build/chrome-mv3-prod` directory
-
+### 2. Load the Unpacked Extension
+- Go to `chrome://extensions/`
+- Enable Developer Mode
+- Click "Load unpacked" and select the directory where you unzipped the extension.
 
 ## Usage
 - On ChatGPT, Claude, Gemini, type your prompt as usual.
