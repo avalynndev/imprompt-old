@@ -1,17 +1,12 @@
 # Imprompt
-
-A Chrome extension that enhances prompts on ChatGPT and Gemini websites, making your AI interactions more effective and productive.
-
----
+A Chrome extension that enhances prompts on ChatGPT, Claude and Gemini websites, making your AI interactions more effective and productive.
 
 ## Features
-
 - Instantly rewrite and enhance your prompts for better AI results
-- Seamless integration with ChatGPT and Gemini
+- Seamless integration with ChatGPT, Claude and Gemini
 - Simple, user-friendly interface
 - Secure: your prompts are processed locally in your browser
 
----
 
 ## Installation
 
@@ -21,7 +16,7 @@ A Chrome extension that enhances prompts on ChatGPT and Gemini websites, making 
    cd imprompt
    ```
 2. **Add your Gemini API key:**
-   Edit the API key in `src/contents/main.tsx` (or relevant file).
+   Edit the API key in `src/contents/main.tsx`.
 3. **Install dependencies and build:**
    ```bash
    npm install
@@ -30,26 +25,16 @@ A Chrome extension that enhances prompts on ChatGPT and Gemini websites, making 
 4. **Load the extension in Chrome:**
    - Go to `chrome://extensions/`
    - Enable Developer Mode
-   - Click "Load unpacked" and select the `build/chrome-mv3-dev` directory
+   - Click "Load unpacked" and select the `build/chrome-mv3-prod` directory
 
----
 
 ## Usage
-
-- On ChatGPT or Gemini, type your prompt as usual.
+- On ChatGPT, Claude, Gemini, type your prompt as usual.
 - Click the ✨ button to enhance your prompt before sending.
 
----
-
 ## License
-
-This project is licensed under the **AGPL-3.0** for non-commercial use.
-
+This project is licensed under the **MIT** for non-commercial use.
 For commercial use, contact [avalynndev@gmail.com](mailto:avalynndev@gmail.com).
 
----
-
 ## Author
-
-**avalynndev**  
-[avalynndev@gmail.com](mailto:avalynndev@gmail.com)
+**avalynndev** - [avalynndev@gmail.com](mailto:avalynndev@gmail.com)

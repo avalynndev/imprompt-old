@@ -1,25 +1,93 @@
+import { useEffect, useState } from "react";
 import { Button } from "~components/ui/button";
 import "~style.css";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "~components/ui/card";
-import { Separator } from "~components/ui/separator";
-import { ScrollArea } from "~components/ui/scroll-area";
-import { ClaudeLogo, OpenAILogo, GeminiLogo, GithubLogo } from "~logo";
+
+import KoFiLogo, {
+  ClaudeLogo,
+  OpenAILogo,
+  GeminiLogo,
+  GithubLogo,
+} from "~logo";
+import { Input } from "~components/ui/input";
 
 function Popup() {
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [geminiKey, setGeminiKey] = useState("");
+  const [saveStatus, setSaveStatus] = useState("");
+
+  useEffect(() => {
+    document.documentElement.classList.remove("light", "dark");
+    document.documentElement.classList.add(theme);
+
+    chrome.storage.sync.get("geminiKey", (data) => {
+      if (data.geminiKey) {
+        setGeminiKey(data.geminiKey);
+      }
+    });
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
+
+  const handleSaveKey = () => {
+    chrome.storage.sync.set({ geminiKey }, () => {
+      setSaveStatus("API Key saved successfully!");
+      setTimeout(() => setSaveStatus(""), 2000);
+    });
+  };
+
   const aiModels = [
-//    { name: "Chat GPT", icon: <OpenAILogo className="h-4 w-4" /> },
+    { name: "ChatGPT", icon: <OpenAILogo className="h-4 w-4" /> },
     { name: "Gemini", icon: <GeminiLogo className="h-4 w-4" /> },
-//    { name: "Claude", icon: <ClaudeLogo className="h-4 w-4" /> },
+    { name: "Claude", icon: <ClaudeLogo className="h-4 w-4" /> },
   ];
 
   return (
-    <div className="rounded-xl flex flex-col items-center justify-center h-[460px] w-[350px] p-6 gap-6 bg-background">
+    <div className="relative flex flex-col items-center justify-center w-[350px] p-6 gap-6 bg-gradient-to-br from-pink-100 via-indigo-100 to-blue-100 dark:from-[#1f1f2e] dark:via-[#2b2b3c] dark:to-[#1f1f2e]">
+      {/* Theme toggle button in top right */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="absolute top-4 right-4 z-10 group/toggle extend-touch-target min-h-10"
+        onClick={toggleTheme}
+        title="Toggle theme"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="size-4.5"
+        >
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+          <path d="M12 3l0 18" />
+          <path d="M12 9l4.65 -4.65" />
+          <path d="M12 14.3l7.37 -7.37" />
+          <path d="M12 19.6l8.85 -8.85" />
+        </svg>
+        <span className="sr-only">Toggle theme</span>
+      </Button>
+      {/* Main content */}{" "}
+      <a
+        href="https://github.com/avalynndev/imprompt"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute top-4 right-14 z-10 group/toggle flex items-center gap-2"
+        >
+          <GithubLogo />
+        </Button>
+      </a>
       <div className="flex flex-col items-center gap-2">
         {" "}
         <svg
@@ -43,39 +111,75 @@ function Popup() {
           your AI interactions more effective and productive.
         </span>
       </div>
-      <div className="flex gap-3">
-        <a href="#" target="_blank" rel="noopener noreferrer">
-          <Button>Donate (Ko-fi)</Button>
-        </a>
-        <a
-          href="https://github.com/avalynndev/imprompt"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Button variant="outline" className="flex items-center gap-2">
-            <GithubLogo /> GitHub
+      <div className="flex flex-col gap-4 w-full max-w-md mx-auto">
+        <div className="flex flex-col items-center gap-4 w-full bg-muted/30 backdrop-blur-md border border-muted p-6 rounded-2xl shadow-lg">
+          <span className="text-xl font-bold tracking-tight text-muted-foreground">
+            API Key
+          </span>
+          <div className="w-full flex flex-col gap-2">
+            <Input
+              type="password"
+              placeholder="Enter your Gemini API Key"
+              value={geminiKey}
+              onChange={(e) => setGeminiKey(e.target.value)}
+              className="bg-background/80"
+            />
+            <Button onClick={handleSaveKey} className="w-full">
+              Save Key
+            </Button>
+            {saveStatus && (
+              <p className="text-xs text-green-500 text-center mt-1">
+                {saveStatus}
+              </p>
+            )}
+          </div>
+        </div>
+        {/* Ko-Fi Donate Button */}
+        <div className="flex justify-center">
+          <Button
+            disabled
+            className="flex items-center gap-2 bg-[#202020] dark:bg-[#E3D6C6] text-white dark:text-black"
+          >
+            <KoFiLogo className="h-5 w-5" />
+            <span className="font-medium">Donate (Ko-fi)</span>
           </Button>
-        </a>
-      </div>
-      <Card className="p-4">
-        <span className="text-lg font-semibold">Supported AI Models</span>
-        <Separator className="my-4" />
-        <CardContent className="p-0">
-          <ScrollArea>
-            <ul className="flex flex-col gap-2">
-              {aiModels.map((model) => (
-                <li
-                  key={model.name}
-                  className="flex items-center gap-3 p-2 rounded-lg bg-muted"
-                >
+        </div>
+
+        {/* AI Models Card */}
+        <div className="flex flex-col items-center gap-4 w-full bg-muted/30 backdrop-blur-md border border-muted p-6 rounded-2xl shadow-lg">
+          <span className="text-xl font-bold tracking-tight text-muted-foreground">
+            Supported Models
+          </span>
+          <ul className=" grid grid-cols-2 gap-3 w-full">
+            {aiModels.map((model) => (
+              <li
+                key={model.name}
+                className="flex items-center gap-3 p-3 px-4 bg-muted rounded-xl hover:bg-muted/60 transition-all duration-200 group"
+              >
+                <div className="scale-100 group-hover:scale-105 transition-transform">
                   {model.icon}
-                  <span className="text-sm font-medium">{model.name}</span>
-                </li>
-              ))}
-            </ul>
-          </ScrollArea>
-        </CardContent>
-      </Card>
+                </div>
+                <span className="text-sm font-medium group-hover:text-foreground">
+                  {model.name}
+                </span>
+              </li>
+            ))}
+            <a
+              href="https://github.com/avalynndev/imprompt"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 p-3 px-4 h-11 bg-muted rounded-xl hover:bg-muted/60 transition-all duration-200 group"
+            >
+              <Button className="flex items-center gap-3 p-3 px-4 h-11 bg-muted rounded-xl hover:bg-muted/60 w-full">
+                + more
+              </Button>
+            </a>
+          </ul>
+        </div>
+      </div>
+      <span className="text-xs text-muted-foreground">
+        &copy; {new Date().getFullYear()} avalynndev, imprompt
+      </span>
     </div>
   );
 }

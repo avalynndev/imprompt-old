@@ -63,7 +63,8 @@
   "manifest": {
     "key": "$CRX_KEY",
     "host_permissions": [
-      "https://chat.openai.com/*",
+      "https://chatgpt.com/*",
+      "https://claude.ai/*",
       "https://gemini.google.com/*"
     ],
     "web_accessible_resources": [
@@ -72,7 +73,9 @@
           "options.html"
         ],
         "matches": [
-          "<all_urls>"
+          "https://chatgpt.com/*",
+          "https://claude.ai/*",
+          "https://gemini.google.com/*"
         ],
         "extension_ids": [
           "$CRX_ID"

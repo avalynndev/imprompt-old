@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import { streamText } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
-
-const isChatGPT = window.location.hostname.includes("chat.openai.com");
+const isChatGPT = window.location.hostname.includes("chatgpt.com");
 const isGemini = window.location.hostname.includes("gemini.google.com");
+const isClaude = window.location.hostname.includes("claude.ai");
 
-const geminiKey = "AIzaSyCm2JNj8fupxcTclv_s5mDGvV0Jy96f2RI";
+const geminiKey = "";
 
 const google = createGoogleGenerativeAI({
   apiKey: geminiKey,
@@ -13,64 +13,148 @@ const google = createGoogleGenerativeAI({
 
 function Main() {
   useEffect(() => {
-    if (!isChatGPT && !isGemini) return;
+    if (!isChatGPT && !isGemini && !isClaude) return;
 
-    // Function to find and observe text areas and send buttons
     const setupObserver = () => {
-      // Find all input area containers (Gemini/ChatGPT)
-      const inputAreaContainers = document.querySelectorAll(
-        ".input-area-container, .chat-input, .composer, .PromptTextarea__Positioner"
-      );
+      let inputAreaContainers = [];
+
+      if (isChatGPT) {
+        const composerTrailingActions = document.querySelectorAll(
+          '[data-testid="composer-trailing-actions"]'
+        );
+        inputAreaContainers = Array.from(composerTrailingActions);
+      } else if (isClaude) {
+        const sendButtons = document.querySelectorAll(
+          'button[aria-label="Send message"]'
+        );
+        const modelSelectors = document.querySelectorAll(
+          '[data-testid="model-selector-dropdown"]'
+        );
+
+        sendButtons.forEach((sendButton) => {
+          let parent = sendButton.parentElement;
+          while (parent && parent !== document.body) {
+            if (
+              parent.classList.contains("flex") &&
+              parent.classList.contains("items-center")
+            ) {
+              inputAreaContainers.push(parent);
+              break;
+            }
+            parent = parent.parentElement;
+          }
+        });
+        modelSelectors.forEach((selector) => {
+          let parent = selector.parentElement;
+          while (parent && parent !== document.body) {
+            if (
+              parent.classList.contains("flex") &&
+              parent.classList.contains("items-center")
+            ) {
+              if (!inputAreaContainers.includes(parent)) {
+                inputAreaContainers.push(parent);
+              }
+              break;
+            }
+            parent = parent.parentElement;
+          }
+        });
+
+        if (inputAreaContainers.length === 0) {
+          const allFlexContainers = document.querySelectorAll("div.flex");
+          allFlexContainers.forEach((container) => {
+            if (
+              container.querySelector('button[aria-label="Send message"]') ||
+              container.querySelector('[data-testid="model-selector-dropdown"]')
+            ) {
+              inputAreaContainers.push(container);
+            }
+          });
+        }
+      } else {
+        inputAreaContainers = Array.from(
+          document.querySelectorAll(
+            ".input-area-container, .chat-input, .composer, .PromptTextarea__Positioner"
+          )
+        );
+      }
 
       inputAreaContainers.forEach((container) => {
-        // Check if enhance button already exists in this container
         if (container.querySelector(".imprompt-button")) return;
 
-        // Find the send button inside this container
-        const sendButton = container.querySelector(
-          ".send-button-container button.send-button, [data-testid='send-button'], .send-button"
-        );
-        if (!sendButton) return;
+        let textarea = null;
+        if (isChatGPT) {
+          textarea = document.querySelector("#prompt-textarea");
+        } else if (isClaude) {
+          textarea = document.querySelector(
+            ".ProseMirror[contenteditable='true']"
+          );
 
-        // Find the textarea/input for this container
-        const textarea = container.querySelector(
-          "textarea, [contenteditable='true'], [data-testid='chat-input'], .ql-editor"
-        );
-        if (!textarea) return;
+          if (!textarea) {
+            textarea = document.querySelector(
+              '[role="textbox"][contenteditable="true"]'
+            );
+          }
+        } else {
+          textarea = container.querySelector(
+            ".input-area-container, .chat-input, .composer, .PromptTextarea__Positioner"
+          );
+        }
 
-        // Create enhance button with pure CSS
+        if (!textarea) {
+          console.log("Textarea not found for platform:", {
+            isChatGPT,
+            isClaude,
+            isGemini,
+          });
+          return;
+        }
+
+        let marginRight = "8px";
+        if (isChatGPT) marginRight = "0px";
+        if (isClaude) marginRight = "4px";
+
         const enhanceButton = document.createElement("button");
         enhanceButton.innerHTML = "✨";
         enhanceButton.className = "imprompt-button";
         enhanceButton.setAttribute("aria-label", "Imprompt");
         enhanceButton.setAttribute("title", "Imprompt");
+        enhanceButton.type = "button";
 
-        // Add CSS styles directly
-        enhanceButton.style.cssText = `
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          width: 36px;
-          height: 36px;
-          border-radius: 6px;
-          font-size: 14px;
-          font-weight: 500;
-          border: 2px solid #27272a;
-          cursor: pointer;
-          background-color: #27272a;
-          color: #ffffff;
-          transition: all 0.2s ease;
-          margin-right: 8px;
-          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-        `;
+        let buttonStyles = "";
+        buttonStyles = `
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            border: 2px solid #27272a;
+            cursor: pointer;
+            background-color: #27272a;
+            color: #ffffff;
+            transition: all 0.2s ease;
+            margin-right: ${marginRight};
+            margin-left: 4px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+          `;
 
-        // Add click handler
-        enhanceButton.addEventListener("click", async () => {
-          const currentText = textarea
-            ? (textarea instanceof HTMLTextAreaElement
-                ? textarea.value
-                : textarea.textContent) || ""
-            : "";
+        enhanceButton.style.cssText = buttonStyles;
+
+        enhanceButton.addEventListener("click", async (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+
+          let currentText = "";
+          if ((isChatGPT || isClaude) && textarea) {
+            currentText = textarea.textContent || textarea.innerText || "";
+          } else if (textarea instanceof HTMLTextAreaElement) {
+            currentText = textarea.value || "";
+          } else if (textarea) {
+            currentText = textarea.textContent || textarea.innerText || "";
+          }
 
           if (!currentText.trim()) {
             alert("Please type something first!");
@@ -93,14 +177,31 @@ function Main() {
 
             for await (const textPart of textStream) {
               streamedText += textPart;
-              if (textarea instanceof HTMLTextAreaElement) {
+              if ((isChatGPT || isClaude) && textarea) {
+                textarea.textContent = streamedText;
+                // For Claude, also try setting innerHTML as backup
+                if (isClaude) {
+                  textarea.innerHTML = streamedText;
+                }
+              } else if (textarea instanceof HTMLTextAreaElement) {
                 textarea.value = streamedText;
               } else if (textarea) {
                 textarea.textContent = streamedText;
               }
+
+              // Trigger input events
               if (textarea) {
                 textarea.dispatchEvent(new Event("input", { bubbles: true }));
                 textarea.dispatchEvent(new Event("change", { bubbles: true }));
+                // Additional events for Claude
+                if (isClaude) {
+                  textarea.dispatchEvent(
+                    new KeyboardEvent("keydown", { bubbles: true })
+                  );
+                  textarea.dispatchEvent(
+                    new KeyboardEvent("keyup", { bubbles: true })
+                  );
+                }
               }
             }
 
@@ -122,27 +223,53 @@ function Main() {
           }
         });
 
-        // Insert the enhance button before the send button container (outside of it)
-        if (
-          sendButton.parentElement &&
-          sendButton.parentElement.parentElement
-        ) {
-          const sendButtonContainer = sendButton.parentElement;
-          const parentOfSendButtonContainer = sendButtonContainer.parentElement;
-          parentOfSendButtonContainer.insertBefore(
-            enhanceButton,
-            sendButtonContainer
-          );
+        // Insert the enhance button in the correct place for each platform
+        try {
+          if (isChatGPT) {
+            container.insertBefore(enhanceButton, container.firstChild);
+          } else if (isClaude) {
+            container.appendChild(enhanceButton);
+          } else {
+            const sendButton = container.querySelector(
+              ".send-button-container button.send-button, [data-testid='send-button'], .send-button"
+            );
+            if (
+              sendButton &&
+              sendButton.parentElement &&
+              sendButton.parentElement.parentElement
+            ) {
+              const sendButtonContainer = sendButton.parentElement;
+              const parentOfSendButtonContainer =
+                sendButtonContainer.parentElement;
+              parentOfSendButtonContainer.insertBefore(
+                enhanceButton,
+                sendButtonContainer
+              );
+            } else {
+              container.appendChild(enhanceButton);
+            }
+          }
+        } catch (error) {
+          console.error("Error inserting button:", error);
+          // Fallback: just append to container
+          try {
+            container.appendChild(enhanceButton);
+          } catch (fallbackError) {
+            console.error(
+              "Failed to add button even with fallback:",
+              fallbackError
+            );
+          }
         }
       });
     };
 
-    // Run initially
-    setupObserver();
+    // Run initially with a small delay to ensure DOM is ready
+    setTimeout(setupObserver, 100);
 
     // Set up mutation observer to handle dynamic content
     const observer = new MutationObserver(() => {
-      setupObserver();
+      setTimeout(setupObserver, 50);
     });
 
     observer.observe(document.body, {
@@ -155,7 +282,7 @@ function Main() {
     };
   }, []);
 
-  if (!isChatGPT && !isGemini) {
+  if (!isChatGPT && !isGemini && !isClaude) {
     return null;
   }
 
