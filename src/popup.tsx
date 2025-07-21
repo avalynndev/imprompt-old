@@ -142,7 +142,7 @@ function Popup() {
               </li>
             ))}
             <a
-              href="https://github.com/avalynndev/imprompt"
+              href="https://github.com/avalynndev/imprompt#Supported-Models"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 p-3 px-4 h-11 bg-muted rounded-xl hover:bg-muted/60 transition-all duration-200 group"

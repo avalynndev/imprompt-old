@@ -32,6 +32,12 @@ A Chrome extension that enhances prompts on ChatGPT, Claude and Gemini websites,
 - On ChatGPT, Claude, Gemini, type your prompt as usual.
 - Click the ✨ button to enhance your prompt before sending.
 
+## Supported-Models
+- ChatGPT
+- Claude, 
+- Gemini, 
+- more coming soon
+
 ## License
 This project is licensed under the **MIT** for non-commercial use.
 For commercial use, contact [avalynndev@gmail.com](mailto:avalynndev@gmail.com).
